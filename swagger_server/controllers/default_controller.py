@@ -1,7 +1,9 @@
+import datetime
+
 import connexion
 import six
 
-from swagger_server.models import Values
+from swagger_server.models import Values, InlineResponse2001Timeseries
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
 from swagger_server.models.dwd_response import InlineResponse2001  # noqa: E501
 from swagger_server.models.inline_response400 import InlineResponse400  # noqa: E501
@@ -40,13 +42,35 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     :rtype: InlineResponse2001
     """
 
-    val = Values()
+    if start is None:
+        start = '01.01.{0:04d} 00:00:00'.format(datetime.MINYEAR)
 
-    resp = InlineResponse2001()
+    if end is None:
+        end = '31.12.{0:04d} 23:59:59'.format(datetime.MAXYEAR)
 
-    #dwd_ftp(resp)
+    start = util.deserialize_datetime(start)
+    end = util.deserialize_datetime(end)
 
-    # start = util.deserialize_datetime(start)
-    # end = util.deserialize_datetime(end)
-    # return 'do some awesome magic!'
+    resp = InlineResponse2001(station_id=stationId, resolution=resolution,
+                              observation_type=observation_type)  # type: InlineResponse2001
+
+    ts = InlineResponse2001Timeseries(
+        timestamp=datetime.datetime.now(),
+        epoch='recent',
+        source_file='foo.csv',
+        source_url='ftp://example.com/foo.zip',
+        source_line=23
+    )
+
+    ts.values = [
+        Values(name='QN', value=3),
+        Values(name='PP_10', value=-999),
+        Values(name='TT_10', value=13.2),
+        Values(name='TM5_10', value=14.9),
+        Values(name='RF_10', value=75.9),
+        Values(name='TD_10', value=9.0),
+    ]
+
+    resp.timeseries = [ts]
+
     return resp
