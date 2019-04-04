@@ -2,13 +2,14 @@ import datetime
 
 import connexion
 import six
+from flask import  Flask
 
+from dwd_code.capabilities import main
 from swagger_server.models import Values, ResponseTimeseries
 from swagger_server.models.dwd_response200 import Response200  # noqa: E501
 from swagger_server.models.dwd_response import Response  # noqa: E501
 from swagger_server.models.dwd_response400 import Response400  # noqa: E501
 from swagger_server import util
-
 
 def capabilities_station_id_get(stationId):  # noqa: E501
     """capabilities_station_id_get
@@ -20,7 +21,8 @@ def capabilities_station_id_get(stationId):  # noqa: E501
 
     :rtype: InlineResponse200
     """
-    return 'do some magic!'
+    dict = main(stationId)
+    return dict
 
 
 def timeseries_station_id_resolution_observation_type_get(stationId, resolution, observation_type, start=None, end=None):  # noqa: E501
