@@ -5,14 +5,14 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
-from swagger_server.models.dwd_response import InlineResponse2001  # noqa: E501
-from swagger_server.models.inline_response400 import InlineResponse400  # noqa: E501
+from swagger_server.models.dwd_response200 import Response200  # noqa: E501
+from swagger_server.models.dwd_response import Response  # noqa: E501
+from swagger_server.models.dwd_response400 import Response400  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
-class TestDefaultController(BaseTestCase):
-    """DefaultController integration test stubs"""
+class TestController(BaseTestCase):
+    """Controller integration test stubs"""
 
     def test_capabilities_station_id_get(self):
         """Test case for capabilities_station_id_get

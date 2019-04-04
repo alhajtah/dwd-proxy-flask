@@ -3,10 +3,10 @@ import datetime
 import connexion
 import six
 
-from swagger_server.models import Values, InlineResponse2001Timeseries
-from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
-from swagger_server.models.dwd_response import InlineResponse2001  # noqa: E501
-from swagger_server.models.inline_response400 import InlineResponse400  # noqa: E501
+from swagger_server.models import Values, ResponseTimeseries
+from swagger_server.models.dwd_response200 import Response200  # noqa: E501
+from swagger_server.models.dwd_response import Response  # noqa: E501
+from swagger_server.models.dwd_response400 import Response400  # noqa: E501
 from swagger_server import util
 
 
@@ -39,7 +39,7 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     :param end: End of the time range to query
     :type end: str
 
-    :rtype: InlineResponse2001
+    :rtype: Response
     """
 
     if start is None:
@@ -51,10 +51,10 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     start = util.deserialize_datetime(start)
     end = util.deserialize_datetime(end)
 
-    resp = InlineResponse2001(station_id=stationId, resolution=resolution,
-                              observation_type=observation_type)  # type: InlineResponse2001
+    resp = Response(station_id=stationId, resolution=resolution,
+                    observation_type=observation_type)  # type: Response
 
-    ts = InlineResponse2001Timeseries(
+    ts = ResponseTimeseries(
         timestamp=datetime.datetime.now(),
         epoch='recent',
         source_file='foo.csv',
