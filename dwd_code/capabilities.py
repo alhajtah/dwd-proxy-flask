@@ -1,99 +1,79 @@
-from ftptool import FTPHost
 import re
 
-def connect(server, username, password):
-    host = FTPHost.connect(server, user = username, password = password)
 
-    return host
+from dwd_code.dwd_ftp_connect import  FtpSearch
 
-
-def FtpSearch( server, username, password, st_id):
-    host = connect(server, username, password)
-    id = str(st_id)
-
-    choices_tuple = []
-
-    for (dirname, subdirs, files) in host.walk("pub/CDC/observations_germany/climate/"):
-        for file in files:
-            m = re.finditer(r'.*' + id + '.*', file, re.S)
-
-            if m:
-                f = dirname
-                choices_tuple.append(f)
-
-    return choices_tuple
 
 def main(stationId):
-    server = "ftp-cdc.dwd.de"
-    username = 'anonymous'
-    password = 'example@example.de'
-    st_id= int(stationId)
-    t1 = []
-    t2 = []
-    t3 = []
-    t4 = []
-    t5 = []
-    s = FtpSearch(server, username, password,st_id )
+    """
+    :param stationId: String
+    :return: Dictionary
+    """
+    temporary1 = []
+    temporary2 = []
+    temporary3 = []
+    temporary4 = []
+    temporary5 = []
 
+    all_files, _file_path = FtpSearch(resolution = None,observation_type = None, stationId=stationId)
 
-    for c in s:
-        r = re.split('climate/',c)[-1]
+    for file in all_files:
 
+        path_name = re.split('climate/', file)[-1]
 
-        if  r.startswith('10_minutes'):
-             d = r.split('/')
-             t1.append(d[1])
+        if path_name.startswith('10_minutes'):
 
-        elif r.startswith('1_minute'):
-            d = r.split('/')
-            t2.append(d[1])
+            path_split = path_name.split('/')
+            temporary1.append(path_split[1])
 
-        elif r.startswith('daily'):
-            d = r.split('/')
-            t3.append(d[1])
+        elif path_name.startswith('1_minute'):
 
-        elif r.startswith('hourly'):
-            d = r.split('/')
-            t4.append(d[1])
+            path_split = path_name.split('/')
+            temporary2.append(path_split[1])
 
-        elif r.startswith('monthly'):
-            d = r.split('/')
-            t5.append(d[1])
+        elif path_name.startswith('daily'):
+            path_split = path_name.split('/')
+            temporary3.append(path_split[1])
 
+        elif path_name.startswith('hourly'):
+            path_split = path_name.split('/')
+            temporary4.append(path_split[1])
 
+        elif path_name.startswith('monthly'):
+            path_split = path_name.split('/')
+            temporary5.append(path_split[1])
 
-    f1 = list(dict.fromkeys(t1))
-    f2 = list(dict.fromkeys(t2))
-    f3 = list(dict.fromkeys(t3))
-    f4 = list(dict.fromkeys(t4))
-    f5 = list(dict.fromkeys(t5))
+    list_format1 = list(dict.fromkeys(temporary1)) # To remove the duplication in the dict.
+    list_format2 = list(dict.fromkeys(temporary2))
+    list_format3 = list(dict.fromkeys(temporary3))
+    list_format4 = list(dict.fromkeys(temporary4))
+    list_format5 = list(dict.fromkeys(temporary5))
 
-    dic = {
-        "stationId": st_id,
+    dicto = {
+        "stationId": stationId,
         "capabilities": [
             {
                 "resolution": "10_minutes",
-                "observationTypes": f1
+                "observationTypes": list_format1
             },
             {
                 "resolution": "1_minute",
-                "observationTypes": f2
+                "observationTypes": list_format2
 
             },
             {
                 "resolution": "daily",
-                "observationTypes": f3
+                "observationTypes": list_format3
             },
             {
                 "resolution": "hourly",
-                "observationTypes": f4
+                "observationTypes": list_format4
             },
             {
                 "resolution": "monthly",
-                "observationTypes": f5
+                "observationTypes": list_format5
             }
         ]
     }
 
-    return(dic)
-
+    return (dicto)

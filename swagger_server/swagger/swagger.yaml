@@ -7,9 +7,11 @@ info:
   title: "DWD-Proxy"
   contact: {}
 host: "www.example.com"
+#host: "localhost:8080"
 basePath: "/"
 schemes:
 - "https"
+- "http"
 consumes:
 - "application/json"
 produces:
@@ -111,6 +113,7 @@ paths:
             required:
             - "resolution"
             - "timeseries"
+            - "observation_type"
             properties:
               stationId:
                 type: "string"

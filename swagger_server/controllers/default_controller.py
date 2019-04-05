@@ -1,10 +1,12 @@
 import datetime
+import urllib.request
 
 import connexion
 import six
-from flask import  Flask
+from flask import request
 
 from dwd_code.capabilities import main
+from dwd_code.timeseries import default
 from swagger_server.models import Values, ResponseTimeseries
 from swagger_server.models.dwd_response200 import Response200  # noqa: E501
 from swagger_server.models.dwd_response import Response  # noqa: E501
@@ -25,7 +27,9 @@ def capabilities_station_id_get(stationId):  # noqa: E501
     return dict
 
 
-def timeseries_station_id_resolution_observation_type_get(stationId, resolution, observation_type, start=None, end=None):  # noqa: E501
+def timeseries_station_id_resolution_observation_type_get(stationId, resolution, observation_type,
+                                                          start='01.01.{0:04d} 00:00:00'.format(datetime.MINYEAR) ,
+                                                           end = '31.12.{0:04d} 23:59:59'.format(datetime.MAXYEAR)):  # noqa: E501
     """timeseries_station_id_resolution_observation_type_get
 
     Query the DWD FTP service by a specified station, resolution and datatype and a optional timerange # noqa: E501
@@ -44,35 +48,43 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     :rtype: Response
     """
 
-    if start is None:
-        start = '01.01.{0:04d} 00:00:00'.format(datetime.MINYEAR)
+    # start = start.format(datetime.MINYEAR)
+    # end = request.args.get('end').format(datetime.MINYEAR)
+    #start_test = request.args.get('start')
+    # start = util.deserialize_datetime(start)
+    # end = util.deserialize_datetime(end)
+    resp, path = default(stationId, resolution, observation_type, start, end)
 
-    if end is None:
-        end = '31.12.{0:04d} 23:59:59'.format(datetime.MAXYEAR)
 
-    start = util.deserialize_datetime(start)
-    end = util.deserialize_datetime(end)
+    # if start is None:
+    #     start = '01.01.{0:04d} 00:00:00'.format(datetime.MINYEAR)
+    #
+    # if end is None:
+    #     end = '31.12.{0:04d} 23:59:59'.format(datetime.MAXYEAR)
 
-    resp = Response(station_id=stationId, resolution=resolution,
-                    observation_type=observation_type)  # type: Response
+    # start = util.deserialize_datetime(start)
+    # end = util.deserialize_datetime(end)
+    #
+    # resp = Response(station_id=stationId, resolution=resolution,
+    #                 observation_type=observation_type)  # type: Response
+    #
+    # ts = ResponseTimeseries(
+    #     timestamp=datetime.datetime.now(),
+    #     epoch='recent',
+    #     source_file='foo.csv',
+    #     source_url='ftp://example.com/foo.zip',
+    #     source_line=23
+    # )
+    #
+    # ts.values = [
+    #     Values(name='QN', value=3),
+    #     Values(name='PP_10', value=-999),
+    #     Values(name='TT_10', value=13.2),
+    #     Values(name='TM5_10', value=14.9),
+    #     Values(name='RF_10', value=75.9),
+    #     Values(name='TD_10', value=9.0),
+    # ]
+    #
+    # resp.timeseries = [ts]
 
-    ts = ResponseTimeseries(
-        timestamp=datetime.datetime.now(),
-        epoch='recent',
-        source_file='foo.csv',
-        source_url='ftp://example.com/foo.zip',
-        source_line=23
-    )
-
-    ts.values = [
-        Values(name='QN', value=3),
-        Values(name='PP_10', value=-999),
-        Values(name='TT_10', value=13.2),
-        Values(name='TM5_10', value=14.9),
-        Values(name='RF_10', value=75.9),
-        Values(name='TD_10', value=9.0),
-    ]
-
-    resp.timeseries = [ts]
-
-    return resp
+    return path
