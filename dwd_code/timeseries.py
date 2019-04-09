@@ -8,99 +8,129 @@ from dwd_code.dwd_constant import *
 
 import pandas as pd
 
-from dwd_code.dwd_ftp_connect import FtpSearch
+from dwd_code.dwd_ftp_connect import FtpFileFinder
 from swagger_server import util
 from swagger_server.models import Response, ResponseTimeseries, Values
 
-def dwd_responce(stationId, resolution, observation_type, file_path, r_dict):
-    path = DWD_SERVER + '/' + file_path
-    path_split = file_path.split('/')
-    file_name = path_split[-1]
-    epoch = path_split[-2]
-    line_num = 0
-    resp = Response(station_id = stationId, resolution = resolution,
-                    observation_type = observation_type)  # type: Response
-    ts = ResponseTimeseries(
-        timestamp = datetime.datetime.now( ),
-        epoch = epoch,
-        source_file = file_name,
-        source_url = path,
-        source_line = line_num
-    )
-    ts.values = []
-    for i, d in enumerate(r_dict, 2):
-        del d['STATIONS_ID']
-        del d['eor']
-
-        for k, v in d.items( ):
-            ts.values.append(Values(name = k, value = v))
-    resp.timeseries = [ts]
-
-    return resp
-
-def zip_extract(half_path, stationId, resolution, observation_type):
-    """
-
-    :param half_path:
-    :param stationId:
-    :param resolution:
-    :param observation_type:
-    :return:
-    """
-    path = DWD_SERVER + half_path
+class TimeSeries:
 
 
-    mysock = urllib.request.urlopen(path)
+    stationId =''
+    resolution = ''
+    observation_type = ''
+    start = None
+    end = None
+    path_choises = ''
+    file_path = ''
+    f_read = {}
+    path = ''
+    r_dict = {}
+    all_rsp = {}
 
-    memfile = io.BytesIO(mysock.read( ))
+    def __init__(self, stationId,  resolution, observation_type, start, end):
+        """
 
-    with ZipFile(memfile, 'r') as myzip:
-        nameList = myzip.namelist( )
-        p = re.compile(r'^produkt.*')
-        for name in nameList:
-            m = p.match(name)
-            if m:
-                filename = m.group( )
-        f= myzip.open(filename)
-        f_read = pd.read_csv(f, sep = ";")
-        r_dict =f_read.to_dict('records')
+        :param stationId:
+        :param resolution:
+        :param observation_type:
+        :param start:
+        :param end:
+        """
+
+        self.stationId  = stationId
+        self.resolution = resolution
+        self.observation_type = observation_type
+        self.start = start
+        self.end = end
+        self.path_choises, self.file_path = FtpFileFinder( ).FtpSearch(stationId = self.stationId,
+                                                                       resolution = self.resolution,
+                                                                       observation_type = self.observation_type)
 
 
 
+    #def zip_extract(self,half_path):
+    def zip_extract(self, path):
+        """
+
+        :param path:
+        :return:
+        """
+
+        self.path = "ftp://" +DWD_SERVER +"/"+ path
+
+
+        mysock = urllib.request.urlopen(self.path)
+
+        memfile = io.BytesIO(mysock.read( ))
+
+        with ZipFile(memfile, 'r') as myzip:
+            nameList = myzip.namelist( )
+            p = re.compile(r'^produkt.*')
+            for name in nameList:
+                m = p.match(name)
+                if m:
+                    filename = m.group( )
+            f= myzip.open(filename)
+            f_read = pd.read_csv(f, sep = ";")
+            self.r_dict =f_read.to_dict('records')
+
+        return self.r_dict
+
+
+
+    def dwd_response(self):
+
+        """
+
+        :return:
+        """
 
 
 
 
 
-
-        #f_read['MESS_DATUM'] = util.deserialize_datetime( f_read['MESS_DATUM'].format(datetime.MINYEAR))
-    return resp
-
-def refomrTimeseries(path_choises):
-
-    for half_path in path_choises:
-
-        f_read = zip_extract(half_path)
-
-    return f_read
+        resp = Response()  # type: Response
+        resp.observation_type = self.observation_type
+        resp.resolution =self.resolution
+        resp.station_id= self.stationId
+        resp.timeseries = []
 
 
-def default(stationId, resolution, observation_type, start, end):
-    """
+        for singel_path in self.path_choises:
 
-    :param stationId:
-    :param resolution:
-    :param observation_type:
-    :param start:
-    :param end:
-    :return:
-    """
-    # resp = (stationId, resolution, observation_type, start, end)
-    res = FtpSearch(stationId = stationId, resolution = resolution, observation_type = observation_type)
+            self.r_dict = self.zip_extract(singel_path)
+            path_split = singel_path.split('/')
+            file_name = path_split[-1]
+            epoch = path_split[-2]
 
-    #responce = zip_ex(res[0], stationId, resolution, observation_type)
+
+            for i, d in enumerate(self.r_dict, 2):
+
+                del d['STATIONS_ID']
+                del d['eor']
+                ts = ResponseTimeseries( )
+                ts.epoch = epoch
+                ts.source_line =  i
+                ts.source_file = file_name
+                ts.source_url = self.path
+                ts.values = []
 
 
 
-    # resp.timeseries = [ts]
-    return res
+
+
+                for k, v in d.items( ):
+
+                    if k != 'MESS_DATUM':
+                        ts.values.append(Values(name = k, value = v))
+                    else :
+                        ts.timestamp = util.deserialize_datetime(str(v))
+
+
+
+                resp.timeseries.append(ts)
+
+            #break
+
+
+        return resp

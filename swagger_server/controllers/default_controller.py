@@ -5,15 +5,16 @@ import connexion
 import six
 from flask import request
 
-from dwd_code.capabilities import main
-from dwd_code.timeseries import default
+from dwd_code.capabilities import Capabilities
+from dwd_code.timeseries import TimeSeries
+
 from swagger_server.models import Values, ResponseTimeseries
 from swagger_server.models.dwd_response200 import Response200  # noqa: E501
 from swagger_server.models.dwd_response import Response  # noqa: E501
 from swagger_server.models.dwd_response400 import Response400  # noqa: E501
 from swagger_server import util
 
-def capabilities_station_id_get(stationId):  # noqa: E501
+def capabilities_station_id_get(stationId ):  # noqa: E501
     """capabilities_station_id_get
 
     Query the capabilities of a specific station by its station ID. # noqa: E501
@@ -23,7 +24,9 @@ def capabilities_station_id_get(stationId):  # noqa: E501
 
     :rtype: InlineResponse200
     """
-    dict = main(stationId)
+    c = Capabilities(stationId)
+    dict = c.get_capabilities_by_station_id()
+
     return dict
 
 
@@ -53,7 +56,7 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     #start_test = request.args.get('start')
     # start = util.deserialize_datetime(start)
     # end = util.deserialize_datetime(end)
-    resp, path = default(stationId, resolution, observation_type, start, end)
+
 
 
     # if start is None:
@@ -87,4 +90,6 @@ def timeseries_station_id_resolution_observation_type_get(stationId, resolution,
     #
     # resp.timeseries = [ts]
 
-    return path
+    p = TimeSeries(stationId = stationId, resolution = resolution, observation_type = observation_type, start=start, end=end).dwd_response( )
+
+    return p

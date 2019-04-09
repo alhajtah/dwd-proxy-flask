@@ -1,9 +1,11 @@
 import re
+from ftplib import FTP
 
 from ftptool import FTPHost
 from dwd_code.dwd_constant import *
 
-def connect(server, username, password):
+class FtpFileFinder:
+
     """
     :param server:
     :param username:
@@ -11,47 +13,70 @@ def connect(server, username, password):
     :return:
     """
 
-    host = FTPHost.connect(server, user = username, password = password)
 
-    return host
+    paths = []
+    file_path = ''
+    ftp = None
+    resolution = ''
+    observation_type = ''
+    stationId = ''
 
-def FtpSearch(resolution, observation_type, stationId):
-    """
-    :param resolution:
-    :param observation_type:
-    :param stationId:
-    :return: an Array (where all matched files found) & the File path
-    """
 
-    host = connect(DWD_SERVER, DWD_USERNAME, DWD_PASSWORD)
-    #st_id = f"{stationId:05d}"
 
-    choices_tuple = []
+    def __init__(self):
 
-    if observation_type != None and resolution != None:
+        retry = True
+        while (retry):
+            try:
+                conn = FTP(DWD_SERVER)
+                conn.connect( )
+                self.ftp = FTPHost.connect(DWD_SERVER, user = DWD_USERNAME, password = DWD_PASSWORD)
 
-        walk_path = PATH_TO_WALK +  resolution + "/" + observation_type
+                retry = False
 
-    else:
+            except IOError as e:
+                # print(f'I/O error({e.errno}): {e.strerror}')
+                # print("Retrying...")
+                retry = True
 
-        walk_path = PATH_TO_WALK
+        #self.ftp = FTPHost.connect(DWD_SERVER, user = DWD_USERNAME, password = DWD_PASSWORD)
 
-    for (dirname, subdirs, files) in host.walk(walk_path):
 
-        for file in files:
+    def FtpSearch(self, observation_type, stationId, resolution):
+        """
+        :param resolution:
+        :param observation_type:
+        :param stationId:
+        :return: an Array (where all matched files found) & the File path
+        """
+        self.observation_type = observation_type
+        self.resolution = resolution
+        self.stationId = stationId
 
-            file_finder = re.finditer(r'.*' + str(stationId) + '.*', file, re.S)
+        if self.observation_type != '' and self.resolution != '':
 
-            meta_pattern = re.compile(r'^Meta_Daten.*')
+            walk_path = PATH_TO_WALK +  self.resolution + "/" + self.observation_type
 
-            meta_match = meta_pattern.match(file)
+        else:
 
-            if not meta_match and file_finder:
+            walk_path = PATH_TO_WALK
 
-                for filename in file_finder:
+        for (dirname, subdirs, files) in self.ftp.walk(walk_path):
 
-                    file_path = dirname + "/" + filename.group( )
+            for file in files:
 
-                    choices_tuple.append(file_path)
+                file_finder = re.finditer(r'.*' + self.stationId + '.*', file, re.S)
 
-    return choices_tuple, file_path
+                meta_pattern = re.compile(r'^Meta_Daten.*')
+
+                meta_match = meta_pattern.match(file)
+
+                if not meta_match and file_finder:
+
+                    for filename in file_finder:
+
+                        self.file_path = dirname + "/" + filename.group( )
+
+                        self.paths.append(self.file_path)
+
+        return self.paths, self.file_path
