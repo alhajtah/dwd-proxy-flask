@@ -1,8 +1,6 @@
 import re
-from ftplib import FTP
 
 from ftptool import FTPHost
-from pystache import render
 
 from dwd_code.dwd_constant import *
 
@@ -17,26 +15,26 @@ class FtpFileFinder:
 
     def __init__(self):
         """
-        Test: The connection will be automatically repeated till responding
+        The connection will be automatically done by initialising the class
         """
         try:
             self.ftp = FTPHost.connect(DWD_SERVER, user = DWD_USERNAME, password = DWD_PASSWORD, timeout = 20)
 
 
         except IOError as e:
-            raise  ValueError(f'I/O error({e.errno}): {e.strerror}')
-             #print(f'I/O error({e.errno}): {e.strerror}')
+            raise ValueError(f'I/O error({e.errno}): {e.strerror}')
+            # print(f'I/O error({e.errno}): {e.strerror}')
             # print("Retrying...")
-
-        # self.ftp = FTPHost.connect(DWD_SERVER, user = DWD_USERNAME, password = DWD_PASSWORD)
 
     def findFile(self, start_path, find_pattern, ignore_pattern):
         """
+        Query the FTP server and search for a file with the aid of pattern
+        and ignore the unwanted files with the same pattern.
+        :param start_path: string, where to search *start from root path {/}
+        :param find_pattern: regular expression pattern
+        :param ignore_pattern: regular expression pattern
+        :return:list, where the first value stand for all paths found
 
-        :param start_path:
-        :param find_pattern:
-        :param ignore_pattern:
-        :return:
         """
 
         for (dirname, subdirs, files) in self.ftp.walk(start_path):
@@ -56,6 +54,4 @@ class FtpFileFinder:
 
                         self.paths.append(self.file_path)
 
-        return self.paths, self.file_path
-
-
+        return self.paths

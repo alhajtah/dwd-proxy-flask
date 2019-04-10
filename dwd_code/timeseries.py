@@ -22,7 +22,6 @@ class TimeSeries:
     start = None
     end = None
     path_choices = ''
-    file_path = ''
     f_read = {}
     path = ''
     r_dict = {}
@@ -44,11 +43,8 @@ class TimeSeries:
         self.observation_type = observation_type
         self.start = start
         self.end = end
-        self.path_choices, self.file_path = FtpFileFinder().findFile(
-            self.generateWalkPathByResolutionAndStationId(),r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
-
-
-
+        self.path_choices = FtpFileFinder( ).findFile(self.generateWalkPathByResolutionAndStationId( ),
+                                                      r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
 
     def generateWalkPathByResolutionAndStationId(self):
         """
@@ -56,7 +52,6 @@ class TimeSeries:
         :return:
         """
         return PATH_TO_WALK + self.resolution + "/" + self.observation_type
-
 
     def zip_extract(self, path):
         """
@@ -127,8 +122,6 @@ class TimeSeries:
 
                 resp.timeseries.append(ts)
 
-
-                #break
-
+                # break
 
         return resp
