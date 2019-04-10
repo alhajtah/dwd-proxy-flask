@@ -10,26 +10,26 @@ host: "www.example.com"
 #host: "localhost:8080"
 basePath: "/"
 schemes:
-- "https"
-- "http"
+  - "https"
+  - "http"
 consumes:
-- "application/json"
+  - "application/json"
 produces:
-- "application/json"
+  - "application/json"
 paths:
   /capabilities/{stationId}:
     get:
       description: "Query the capabilities of a specific station by its station ID."
       operationId: "capabilities_station_id_get"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "stationId"
-        in: "path"
-        description: "The DWD station id derived from [list](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_list_soil.txt)\
+        - name: "stationId"
+          in: "path"
+          description: "The DWD station id derived from [list](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_list_soil.txt)\
           \ or [map](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_map_soil.png)\n"
-        required: true
-        type: "string"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Capabilities of the queried station."
@@ -53,67 +53,67 @@ paths:
         \ datatype and a optional timerange"
       operationId: "timeseries_station_id_resolution_observation_type_get"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "stationId"
-        in: "path"
-        description: "The DWD station id derived from [list](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_list_soil.txt)\
+        - name: "stationId"
+          in: "path"
+          description: "The DWD station id derived from [list](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_list_soil.txt)\
           \ or [map](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_map_soil.png)\n"
-        required: true
-        type: "string"
-      - name: "resolution"
-        in: "path"
-        description: "The resolution which should be queried\n"
-        required: true
-        type: "string"
-        enum:
-        - "10_minutes"
-        - "1_minute"
-        - "daily"
-        - "hourly"
-        - "monthly"
-      - name: "observation_type"
-        in: "path"
-        description: "The type of observation which should be queried\n"
-        required: true
-        type: "string"
-        enum:
-        - "air_temperature"
-        - "cloudiness"
-        - "cloud_type"
-        - "extreme_temperature"
-        - "extreme_wind"
-        - "kl"
-        - "more_precip"
-        - "precipitation"
-        - "pressure"
-        - "soil_temperature"
-        - "solar"
-        - "sun"
-        - "visibility"
-        - "water_equiv"
-        - "wind"
-      - name: "start"
-        in: "query"
-        description: "Start of the timerange to query"
-        required: false
-        type: "string"
-        format: "date-time"
-      - name: "end"
-        in: "query"
-        description: "End of the time range to query"
-        required: false
-        type: "string"
-        format: "date-time"
+          required: true
+          type: "string"
+        - name: "resolution"
+          in: "path"
+          description: "The resolution which should be queried\n"
+          required: true
+          type: "string"
+          enum:
+            - "10_minutes"
+            - "1_minute"
+            - "daily"
+            - "hourly"
+            - "monthly"
+        - name: "observation_type"
+          in: "path"
+          description: "The type of observation which should be queried\n"
+          required: true
+          type: "string"
+          enum:
+            - "air_temperature"
+            - "cloudiness"
+            - "cloud_type"
+            - "extreme_temperature"
+            - "extreme_wind"
+            - "kl"
+            - "more_precip"
+            - "precipitation"
+            - "pressure"
+            - "soil_temperature"
+            - "solar"
+            - "sun"
+            - "visibility"
+            - "water_equiv"
+            - "wind"
+        - name: "start"
+          in: "query"
+          description: "Start of the timerange to query"
+          required: false
+          type: "string"
+          format: "date-time"
+        - name: "end"
+          in: "query"
+          description: "End of the time range to query"
+          required: false
+          type: "string"
+          format: "date-time"
       responses:
         200:
           description: "Timeseries for the given station id and the optional timerange"
           schema:
             type: "object"
             required:
-            - "resolution"
-            - "timeseries"
-            - "observation_type"
+              - "resolution"
+              - "timeseries"
+              - "observation_type"
             properties:
               stationId:
                 type: "string"
@@ -122,30 +122,30 @@ paths:
                 type: "string"
                 description: "The given resolution"
                 enum:
-                - "10_minutes"
-                - "1_minute"
-                - "daily"
-                - "hourly"
-                - "monthly"
+                  - "10_minutes"
+                  - "1_minute"
+                  - "daily"
+                  - "hourly"
+                  - "monthly"
               observation_type:
                 type: "string"
                 description: "The given observation type"
                 enum:
-                - "air_temperature"
-                - "cloudiness"
-                - "cloud_type"
-                - "extreme_temperature"
-                - "extreme_wind"
-                - "kl"
-                - "more_precip"
-                - "precipitation"
-                - "pressure"
-                - "soil_temperature"
-                - "solar"
-                - "sun"
-                - "visibility"
-                - "water_equiv"
-                - "wind"
+                  - "air_temperature"
+                  - "cloudiness"
+                  - "cloud_type"
+                  - "extreme_temperature"
+                  - "extreme_wind"
+                  - "kl"
+                  - "more_precip"
+                  - "precipitation"
+                  - "pressure"
+                  - "soil_temperature"
+                  - "solar"
+                  - "sun"
+                  - "visibility"
+                  - "water_equiv"
+                  - "wind"
               timeseries:
                 type: "array"
                 description: "An array of objects with timestamp, measurement values\
@@ -157,8 +157,8 @@ paths:
           schema:
             type: "object"
             required:
-            - "code"
-            - "message"
+              - "code"
+              - "message"
             properties:
               code:
                 type: "string"
@@ -169,8 +169,8 @@ paths:
           schema:
             type: "object"
             required:
-            - "code"
-            - "message"
+              - "code"
+              - "message"
             properties:
               code:
                 type: "string"
@@ -181,29 +181,29 @@ definitions:
   Resolutions:
     type: "string"
     enum:
-    - "10_minutes"
-    - "1_minute"
-    - "daily"
-    - "hourly"
-    - "monthly"
+      - "10_minutes"
+      - "1_minute"
+      - "daily"
+      - "hourly"
+      - "monthly"
   ObservationTypes:
     type: "string"
     enum:
-    - "air_temperature"
-    - "cloudiness"
-    - "cloud_type"
-    - "extreme_temperature"
-    - "extreme_wind"
-    - "kl"
-    - "more_precip"
-    - "precipitation"
-    - "pressure"
-    - "soil_temperature"
-    - "solar"
-    - "sun"
-    - "visibility"
-    - "water_equiv"
-    - "wind"
+      - "air_temperature"
+      - "cloudiness"
+      - "cloud_type"
+      - "extreme_temperature"
+      - "extreme_wind"
+      - "kl"
+      - "more_precip"
+      - "precipitation"
+      - "pressure"
+      - "soil_temperature"
+      - "solar"
+      - "sun"
+      - "visibility"
+      - "water_equiv"
+      - "wind"
   StationId:
     type: "string"
     description: "The DWD station id derived from [list](ftp://ftp-cdc.dwd.de/pub/CDC/help/stations_list_soil.txt)\
@@ -213,35 +213,35 @@ definitions:
       resolution:
         type: "string"
         enum:
-        - "10_minutes"
-        - "1_minute"
-        - "daily"
-        - "hourly"
-        - "monthly"
+          - "10_minutes"
+          - "1_minute"
+          - "daily"
+          - "hourly"
+          - "monthly"
       observationTypes:
         type: "array"
         items:
           type: "string"
           enum:
-          - "air_temperature"
-          - "cloudiness"
-          - "cloud_type"
-          - "extreme_temperature"
-          - "extreme_wind"
-          - "kl"
-          - "more_precip"
-          - "precipitation"
-          - "pressure"
-          - "soil_temperature"
-          - "solar"
-          - "sun"
-          - "visibility"
-          - "water_equiv"
-          - "wind"
+            - "air_temperature"
+            - "cloudiness"
+            - "cloud_type"
+            - "extreme_temperature"
+            - "extreme_wind"
+            - "kl"
+            - "more_precip"
+            - "precipitation"
+            - "pressure"
+            - "soil_temperature"
+            - "solar"
+            - "sun"
+            - "visibility"
+            - "water_equiv"
+            - "wind"
     example:
       observationTypes:
-      - "air_temperature"
-      - "air_temperature"
+        - "air_temperature"
+        - "air_temperature"
       resolution: "10_minutes"
   inline_response_200:
     properties:
@@ -256,19 +256,19 @@ definitions:
           $ref: "#/definitions/inline_response_200_capabilities"
     example:
       capabilities:
-      - observationTypes:
-        - "air_temperature"
-        - "air_temperature"
-        resolution: "10_minutes"
-      - observationTypes:
-        - "air_temperature"
-        - "air_temperature"
-        resolution: "10_minutes"
+        - observationTypes:
+            - "air_temperature"
+            - "air_temperature"
+          resolution: "10_minutes"
+        - observationTypes:
+            - "air_temperature"
+            - "air_temperature"
+          resolution: "10_minutes"
       stationId: "stationId"
   inline_response_200_1_values:
     required:
-    - "name"
-    - "value"
+      - "name"
+      - "value"
     properties:
       name:
         type: "string"
@@ -283,11 +283,11 @@ definitions:
       value: 6.02745618307040320615897144307382404804229736328125
   inline_response_200_1_timeseries:
     required:
-    - "sourceFile"
-    - "sourceLine"
-    - "sourceUrl"
-    - "timestamp"
-    - "values"
+      - "sourceFile"
+      - "sourceLine"
+      - "sourceUrl"
+      - "timestamp"
+      - "values"
     properties:
       timestamp:
         type: "string"
@@ -297,9 +297,9 @@ definitions:
         type: "string"
         description: "The source epoch from which the dataset is extracted."
         enum:
-        - "recent"
-        - "historical"
-        - "now"
+          - "recent"
+          - "historical"
+          - "now"
       sourceFile:
         type: "string"
         description: "Name and optionally path of the file within the zip archive."
@@ -320,17 +320,17 @@ definitions:
       sourceUrl: "sourceUrl"
       sourceLine: 0.80082819046101150206595775671303272247314453125
       values:
-      - name: "name"
-        value: 6.02745618307040320615897144307382404804229736328125
-      - name: "name"
-        value: 6.02745618307040320615897144307382404804229736328125
+        - name: "name"
+          value: 6.02745618307040320615897144307382404804229736328125
+        - name: "name"
+          value: 6.02745618307040320615897144307382404804229736328125
       epoch: "recent"
       sourceFile: "sourceFile"
       timestamp: "2000-01-23T04:56:07.000+00:00"
   inline_response_200_1:
     required:
-    - "resolution"
-    - "timeseries"
+      - "resolution"
+      - "timeseries"
     properties:
       stationId:
         type: "string"
@@ -339,30 +339,30 @@ definitions:
         type: "string"
         description: "The given resolution"
         enum:
-        - "10_minutes"
-        - "1_minute"
-        - "daily"
-        - "hourly"
-        - "monthly"
+          - "10_minutes"
+          - "1_minute"
+          - "daily"
+          - "hourly"
+          - "monthly"
       observation_type:
         type: "string"
         description: "The given observation type"
         enum:
-        - "air_temperature"
-        - "cloudiness"
-        - "cloud_type"
-        - "extreme_temperature"
-        - "extreme_wind"
-        - "kl"
-        - "more_precip"
-        - "precipitation"
-        - "pressure"
-        - "soil_temperature"
-        - "solar"
-        - "sun"
-        - "visibility"
-        - "water_equiv"
-        - "wind"
+          - "air_temperature"
+          - "cloudiness"
+          - "cloud_type"
+          - "extreme_temperature"
+          - "extreme_wind"
+          - "kl"
+          - "more_precip"
+          - "precipitation"
+          - "pressure"
+          - "soil_temperature"
+          - "solar"
+          - "sun"
+          - "visibility"
+          - "water_equiv"
+          - "wind"
       timeseries:
         type: "array"
         description: "An array of objects with timestamp, measurement values and metadata."
@@ -370,33 +370,33 @@ definitions:
           $ref: "#/definitions/inline_response_200_1_timeseries"
     example:
       timeseries:
-      - sourceUrl: "sourceUrl"
-        sourceLine: 0.80082819046101150206595775671303272247314453125
-        values:
-        - name: "name"
-          value: 6.02745618307040320615897144307382404804229736328125
-        - name: "name"
-          value: 6.02745618307040320615897144307382404804229736328125
-        epoch: "recent"
-        sourceFile: "sourceFile"
-        timestamp: "2000-01-23T04:56:07.000+00:00"
-      - sourceUrl: "sourceUrl"
-        sourceLine: 0.80082819046101150206595775671303272247314453125
-        values:
-        - name: "name"
-          value: 6.02745618307040320615897144307382404804229736328125
-        - name: "name"
-          value: 6.02745618307040320615897144307382404804229736328125
-        epoch: "recent"
-        sourceFile: "sourceFile"
-        timestamp: "2000-01-23T04:56:07.000+00:00"
+        - sourceUrl: "sourceUrl"
+          sourceLine: 0.80082819046101150206595775671303272247314453125
+          values:
+            - name: "name"
+              value: 6.02745618307040320615897144307382404804229736328125
+            - name: "name"
+              value: 6.02745618307040320615897144307382404804229736328125
+          epoch: "recent"
+          sourceFile: "sourceFile"
+          timestamp: "2000-01-23T04:56:07.000+00:00"
+        - sourceUrl: "sourceUrl"
+          sourceLine: 0.80082819046101150206595775671303272247314453125
+          values:
+            - name: "name"
+              value: 6.02745618307040320615897144307382404804229736328125
+            - name: "name"
+              value: 6.02745618307040320615897144307382404804229736328125
+          epoch: "recent"
+          sourceFile: "sourceFile"
+          timestamp: "2000-01-23T04:56:07.000+00:00"
       resolution: "10_minutes"
       stationId: "stationId"
       observation_type: "air_temperature"
   inline_response_400:
     required:
-    - "code"
-    - "message"
+      - "code"
+      - "message"
     properties:
       code:
         type: "string"
