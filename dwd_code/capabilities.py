@@ -17,8 +17,8 @@ class Capabilities:
         :param stationId: String *required
         """
         self.stationId = stationId
-        self.all_files = FtpFileFinder( ).findFile(self.generateWalkPath( ),
-                                                   r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
+        self.all_files = FtpFileFinder().findFile(self.generateWalkPath(),
+                                                  r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
 
     def get_capabilities_by_station_id(self):
 

@@ -1,9 +1,11 @@
 import io
 import re
 import urllib
+import datetime
 from zipfile import ZipFile
 
 import pandas as pd
+import pytz
 
 from dwd_code.dwd_constant import *
 from dwd_code.dwd_file_finder import FtpFileFinder
@@ -19,13 +21,13 @@ class TimeSeries:
     stationId = ''
     resolution = ''
     observation_type = ''
+    pattern_searched_file = r'^produkt.*'
     start = None
     end = None
     path_choices = ''
-    f_read = {}
     path = ''
-    r_dict = {}
-    all_rsp = {}
+    times = []
+    response = None
 
     def __init__(self, stationId, resolution, observation_type, start, end):
         """
@@ -41,87 +43,105 @@ class TimeSeries:
         self.stationId = stationId
         self.resolution = resolution
         self.observation_type = observation_type
-        self.start = start
-        self.end = end
-        self.path_choices = FtpFileFinder( ).findFile(self.generateWalkPathByResolutionAndStationId( ),
-                                                      r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
+        self.start = util.deserialize_datetime(start)
+        self.end = util.deserialize_datetime(end)
+        self.path_choices = FtpFileFinder().findFile(self.generateWalkPathByResolutionAndStationId(),
+                                                     r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
+        self.response = Response()
+        self.response.observation_type = self.observation_type
+        self.response.resolution = self.resolution
+        self.response.station_id = self.stationId
+        self.response.timeseries = []
 
     def generateWalkPathByResolutionAndStationId(self):
         """
-
-        :return:
+        add the resolution and the observation type to the path
+        :return: String
         """
         return PATH_TO_WALK + self.resolution + "/" + self.observation_type
 
-    def zip_extract(self, path):
+    def zip_extract(self, half_path):
         """
         unpacking a single zip file for a path.
         returns a dictionary sorted by records
-        :param path: string
+        :param half_path: string
         :return: Dictionary
         """
 
-        self.path = "ftp://" + DWD_SERVER + "/" + path
+        self.path = "ftp://" + DWD_SERVER + "/" + half_path
 
         mysock = urllib.request.urlopen(self.path)
 
-        memfile = io.BytesIO(mysock.read( ))
+        memfile = io.BytesIO(mysock.read())
 
         with ZipFile(memfile, 'r') as myzip:
-            nameList = myzip.namelist( )
-            p = re.compile(r'^produkt.*')
+
+            nameList = myzip.namelist()
+            p = re.compile(self.pattern_searched_file)
+
             for name in nameList:
                 m = p.match(name)
                 if m:
-                    filename = m.group( )
+                    filename = m.group()
             f = myzip.open(filename)
-            f_read = pd.read_csv(f, sep = ";")
-            self.r_dict = f_read.to_dict('records')
+            csv_read = pd.read_csv(f, sep = ";")  # read as DataFrame
+            start_date = csv_read['MESS_DATUM'][0]  # get the start date of CSV
+            end_date = csv_read['MESS_DATUM'][-1:].values  # get end date of CSV
+            dict_date = dict(start = start_date, end = end_date[0])
 
-        return self.r_dict
+            self.times.append(dict_date)
+
+        return csv_read
 
     def dwd_response(self):
 
         """
-        reforming the response to match with swagger definition
+        concat the different CSV's and reform the respond Object to but Meta Data on  the top of each
+        row.
         :return: Dictionary
         """
 
-        resp = Response( )  # type: Response
-        resp.observation_type = self.observation_type
-        resp.resolution = self.resolution
-        resp.station_id = self.stationId
-        resp.timeseries = []
-        # timeseries = []
+        for single_path in self.path_choices:  # Loop over path path choices to look over
 
-        for singel_path in self.path_choices:
-
-            self.r_dict = self.zip_extract(singel_path)
-            path_split = singel_path.split('/')
+            r_dict = self.zip_extract(single_path)
+            path_split = single_path.split('/')
             file_name = path_split[-1]
             epoch = path_split[-2]
 
-            for i, ditr in enumerate(self.r_dict, 2):
+            self.extract_timestamps(epoch, file_name, r_dict)
 
-                del ditr['STATIONS_ID']
-                del ditr['eor']
+        return self.response
 
-                ts = ResponseTimeseries( )
-                ts.epoch = epoch
-                ts.source_line = i
-                ts.source_file = file_name
-                ts.source_url = self.path
-                ts.values = []
 
-                for k, v in ditr.items( ):
+    def extract_timestamps(self, epoch, file_name, r_dict):
+        if epoch == 'recent':  # remove redundancy (the Data from 'historical' comes at first )
+            list_of_dicts = r_dict[r_dict['MESS_DATUM'] > int(self.times[0]['end'])].to_dict('records')
 
-                    if k != 'MESS_DATUM':
-                        ts.values.append(Values(name = k, value = v))
-                    else:
-                        ts.timestamp = util.deserialize_datetime(str(v))
+        else:
+            list_of_dicts = r_dict.to_dict('records')
+            # loop over the dictionary to delete the unused column &  reorganize the TimeSeries
+        for i, single_dict in enumerate(list_of_dicts, 2):
 
-                resp.timeseries.append(ts)
+            del single_dict['STATIONS_ID']
+            del single_dict['eor']
+            single_dict['timestamp'] = util.deserialize_datetime(str(single_dict['MESS_DATUM']))
+            del single_dict['MESS_DATUM']
+            timestamp = pytz.utc.localize(single_dict['timestamp'])  # type: datetime
+            if (self.start <= timestamp) and (timestamp <= self.end):
+                self.extract_timestamp(epoch, file_name, i, single_dict)
 
-                # break
 
-        return resp
+    def extract_timestamp(self, epoch, file_name, source_line_number, single_dict):
+        ts = ResponseTimeseries()
+        ts.epoch = epoch
+        ts.source_line = source_line_number
+        ts.source_file = file_name
+        ts.source_url = self.path
+        ts.values = []
+        for k, v in single_dict.items():
+
+            if k != 'timestamp':
+                ts.values.append(Values(name = k, value = v))
+            else:
+                ts.timestamp = v
+        self.response.timeseries.append(ts)

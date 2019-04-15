@@ -16,7 +16,8 @@ class Response(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, station_id: str=None, resolution: str=None, observation_type: str=None, timeseries: List[ResponseTimeseries]=None):  # noqa: E501
+    def __init__(self, station_id: str = None, resolution: str = None, observation_type: str = None,
+                 timeseries: List[ResponseTimeseries] = None):  # noqa: E501
         """InlineResponse2001 - a model defined in Swagger
 
         :param station_id: The station_id of this InlineResponse2001.  # noqa: E501
@@ -105,7 +106,7 @@ class Response(Model):
         if resolution not in allowed_values:
             raise ValueError(
                 "Invalid value for `resolution` ({0}), must be one of {1}"
-                .format(resolution, allowed_values)
+                    .format(resolution, allowed_values)
             )
 
         self._resolution = resolution
@@ -130,11 +131,13 @@ class Response(Model):
         :param observation_type: The observation_type of this InlineResponse2001.
         :type observation_type: str
         """
-        allowed_values = ["air_temperature", "cloudiness", "cloud_type", "extreme_temperature", "extreme_wind", "kl", "more_precip", "precipitation", "pressure", "soil_temperature", "solar", "sun", "visibility", "water_equiv", "wind"]  # noqa: E501
+        allowed_values = ["air_temperature", "cloudiness", "cloud_type", "extreme_temperature", "extreme_wind", "kl",
+                          "more_precip", "precipitation", "pressure", "soil_temperature", "solar", "sun", "visibility",
+                          "water_equiv", "wind"]  # noqa: E501
         if observation_type not in allowed_values:
             raise ValueError(
                 "Invalid value for `observation_type` ({0}), must be one of {1}"
-                .format(observation_type, allowed_values)
+                    .format(observation_type, allowed_values)
             )
 
         self._observation_type = observation_type
