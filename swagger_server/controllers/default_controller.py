@@ -22,8 +22,8 @@ def capabilities_station_id_get(stationId):  # noqa: E501
 
 
 def timeseries_station_id_resolution_observation_type_get(stationId, resolution, observation_type,
-                                                          start='01.01.{0:04d} 00:00:00'.format(datetime.MINYEAR),
-                                                          end='31.12.{0:04d} 23:59:59'.format(
+                                                          start='01.01.{0:04d} 00:00:00Z'.format(datetime.MINYEAR),
+                                                          end='31.12.{0:04d} 23:59:59Z'.format(
                                                               datetime.MAXYEAR)):  # noqa: E501
     """
 

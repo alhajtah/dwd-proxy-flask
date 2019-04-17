@@ -1,3 +1,4 @@
+import decimal
 import io
 import re
 import urllib
@@ -44,7 +45,7 @@ class TimeSeries:
         self.resolution = resolution
         self.observation_type = observation_type
         self.start = util.deserialize_datetime(start)
-        self.end = util.deserialize_datetime(end)
+        self.end =  util.deserialize_datetime(end)
         self.path_choices = FtpFileFinder().findFile(self.generateWalkPathByResolutionAndStationId(),
                                                      r'.*' + self.stationId + '.*', r'^Meta_Daten.*')
         self.response = Response()
@@ -121,11 +122,10 @@ class TimeSeries:
             list_of_dicts = r_dict.to_dict('records')
             # loop over the dictionary to delete the unused column &  reorganize the TimeSeries
         for i, single_dict in enumerate(list_of_dicts, 2):
-
-            del single_dict['STATIONS_ID']
-            del single_dict['eor']
-            single_dict['timestamp'] = util.deserialize_datetime(str(single_dict['MESS_DATUM']))
-            del single_dict['MESS_DATUM']
+            single_dict.pop('STATIONS_ID', None)
+            single_dict.pop('eor', None)
+            single_dict['timestamp'] = util.deserialize_datetime(str(decimal.Decimal(single_dict['MESS_DATUM'])))
+            single_dict.pop('MESS_DATUM', None)
             timestamp = pytz.utc.localize(single_dict['timestamp'])  # type: datetime
             if (self.start <= timestamp) and (timestamp <= self.end):
                 self.extract_timestamp(epoch, file_name, i, single_dict)
