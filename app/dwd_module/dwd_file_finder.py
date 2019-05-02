@@ -2,7 +2,8 @@ import re
 
 from ftptool import FTPHost
 
-from dwd_code.dwd_constant import *
+from app.dwd_module.dwd_constant import *
+from app.models import Response400
 
 
 class FtpFileFinder:
@@ -17,14 +18,18 @@ class FtpFileFinder:
         """
         The connection will be automatically done by initialising the class
         """
+        self.try_to_connect()
+
+    def try_to_connect(self):
         try:
             self.ftp = FTPHost.connect(DWD_SERVER, user = DWD_USERNAME, password = DWD_PASSWORD, timeout = 20)
 
 
         except IOError as e:
-            raise ValueError(f'I/O error({e.errno}): {e.strerror}')
-            # print(f'I/O error({e.errno}): {e.strerror}')
-            # print("Retrying...")
+            #raise ValueError(f'I/O error({e.errno}): {e.strerror}')
+           return Response400(code=e.errno, message=e.strerror)
+        # print(f'I/O error({e.errno}): {e.strerror}')
+        # print("Retrying...")
 
     def findFile(self, start_path, find_pattern, ignore_pattern):
         """

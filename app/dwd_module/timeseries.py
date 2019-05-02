@@ -8,10 +8,10 @@ from zipfile import ZipFile
 import pandas as pd
 import pytz
 
-from dwd_code.dwd_constant import *
-from dwd_code.dwd_file_finder import FtpFileFinder
-from swagger_server import util
-from swagger_server.models import Response, ResponseTimeseries, Values
+from app.dwd_module.dwd_constant import *
+from app.dwd_module.dwd_file_finder import FtpFileFinder
+from app import util
+from app.models import Response, ResponseTimeseries, Values
 
 
 class TimeSeries:
@@ -115,7 +115,7 @@ class TimeSeries:
 
 
     def extract_timestamps(self, epoch, file_name, r_dict):
-        if epoch == 'recent':  # remove redundancy (the Data from 'historical' comes at first )
+        if epoch in ['recent', 'now']  :  # remove redundancy (the Data from 'historical' comes at first )
             list_of_dicts = r_dict[r_dict['MESS_DATUM'] > int(self.times[0]['end'])].to_dict('records')
 
         else:

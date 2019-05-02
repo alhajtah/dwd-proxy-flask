@@ -1,8 +1,8 @@
 import datetime
 
-from dwd_code.capabilities import Capabilities
-from dwd_code.timeseries import TimeSeries
-from swagger_server.models.dwd_response import Response  # noqa: E501
+from app.dwd_module.capabilities import Capabilities
+from app.dwd_module.timeseries import TimeSeries
+from app.models.dwd_response import Response  # noqa: E501
 
 
 def capabilities_station_id_get(stationId):  # noqa: E501

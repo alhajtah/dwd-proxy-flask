@@ -2,13 +2,7 @@
 
 from __future__ import absolute_import
 
-from flask import json
-from six import BytesIO
-
-from swagger_server.models.dwd_response200 import Response200  # noqa: E501
-from swagger_server.models.dwd_response import Response  # noqa: E501
-from swagger_server.models.dwd_response400 import Response400  # noqa: E501
-from swagger_server.test import BaseTestCase
+from app.test import BaseTestCase
 
 
 class TestController(BaseTestCase):
@@ -20,7 +14,7 @@ class TestController(BaseTestCase):
         
         """
         response = self.client.open(
-            '//capabilities/{stationId}'.format(stationId='stationId_example'),
+            '{HOST}/capabilities/{stationId}'.format(HOST='localhost:8080',stationId='stationId_example'),
             method='GET',
             content_type='application/json')
         self.assert200(response,
@@ -34,7 +28,10 @@ class TestController(BaseTestCase):
         query_string = [('start', '2013-10-20T19:20:30+01:00'),
                         ('end', '2013-10-20T19:20:30+01:00')]
         response = self.client.open(
-            '//timeseries/{stationId}/{resolution}/{observation_type}'.format(stationId='stationId_example', resolution='resolution_example', obeservation_type='obeservation_type_example'),
+            '{HOST}/timeseries/{stationId}/{resolution}/{observation_type}'.format(HOST='localhost:8080',
+                                                                                   stationId='stationId_example',
+                                                                              resolution='resolution_example',
+                                                                              obeservation_type='obeservation_type_example'),
             method='GET',
             content_type='application/json',
             query_string=query_string)

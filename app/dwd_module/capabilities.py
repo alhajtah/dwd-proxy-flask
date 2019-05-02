@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from dwd_code.dwd_file_finder import FtpFileFinder, PATH_TO_WALK
+from app.dwd_module.dwd_file_finder import FtpFileFinder, PATH_TO_WALK
 
 
 class Capabilities:

@@ -5,9 +5,9 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from swagger_server.models.model_ import Model
-from swagger_server.models.values import Values  # noqa: F401,E501
-from swagger_server import util
+from app.models.model_ import Model
+from app.models.values import Values  # noqa: F401,E501
+from app import util
 
 
 class ResponseTimeseries(Model):

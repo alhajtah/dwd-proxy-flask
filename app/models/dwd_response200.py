@@ -5,9 +5,9 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from swagger_server.models.model_ import Model
-from swagger_server.models.dwd_response200_capabilities import Response200Capabilities  # noqa: F401,E501
-from swagger_server import util
+from app.models.model_ import Model
+from app.models.dwd_response200_capabilities import Response200Capabilities  # noqa: F401,E501
+from app import util
 
 
 class Response200(Model):

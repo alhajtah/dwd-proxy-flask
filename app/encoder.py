@@ -1,7 +1,7 @@
 from connexion.apps.flask_app import FlaskJSONEncoder
 import six
 
-from swagger_server.models.model_ import Model
+from app.models.model_ import Model
 
 
 class JSONEncoder(FlaskJSONEncoder):
