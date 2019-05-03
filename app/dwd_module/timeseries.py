@@ -115,6 +115,13 @@ class TimeSeries:
 
 
     def extract_timestamps(self, epoch, file_name, r_dict):
+        """
+        Delete the replicated data, unused column &  reorganize the TimeSeries
+        :param epoch: String
+        :param file_name: String
+        :param r_dict: dictionary
+
+        """
         if epoch in ['recent', 'now']  :  # remove redundancy (the Data from 'historical' comes at first )
             list_of_dicts = r_dict[r_dict['MESS_DATUM'] > int(self.times[0]['end'])].to_dict('records')
 
@@ -124,7 +131,8 @@ class TimeSeries:
         for i, single_dict in enumerate(list_of_dicts, 2):
             single_dict.pop('STATIONS_ID', None)
             single_dict.pop('eor', None)
-            single_dict['timestamp'] = util.deserialize_datetime(str(decimal.Decimal(single_dict['MESS_DATUM'])))
+            source_time = str(decimal.Decimal(single_dict['MESS_DATUM'])).ljust(12, '0')
+            single_dict['timestamp'] = util.deserialize_datetime(source_time)
             single_dict.pop('MESS_DATUM', None)
             timestamp = pytz.utc.localize(single_dict['timestamp'])  # type: datetime
             if (self.start <= timestamp) and (timestamp <= self.end):
@@ -132,6 +140,14 @@ class TimeSeries:
 
 
     def extract_timestamp(self, epoch, file_name, source_line_number, single_dict):
+        """
+        Every single timestamp will be extracted, then Add Meta Data.
+        :param epoch: String
+        :param file_name: String
+        :param source_line_number:
+        :param single_dict:
+
+        """
         ts = ResponseTimeseries()
         ts.epoch = epoch
         ts.source_line = source_line_number
