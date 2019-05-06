@@ -14,6 +14,8 @@ from app import util
 from app.models import Response, ResponseTimeseries, Values
 
 
+
+
 class TimeSeries:
     """
     Query the DWD FTP service by a specified station, resolution and datatype and a optional timerange to filter
@@ -29,6 +31,8 @@ class TimeSeries:
     path = ''
     times = []
     response = None
+    MESS_DATUM = 'MESS_DATUM'
+
 
     def __init__(self, stationId, resolution, observation_type, start, end):
         """
@@ -86,13 +90,22 @@ class TimeSeries:
                     filename = m.group()
             f = myzip.open(filename)
             csv_read = pd.read_csv(f, sep = ";")  # read as DataFrame
-            start_date = csv_read['MESS_DATUM'][0]  # get the start date of CSV
-            end_date = csv_read['MESS_DATUM'][-1:].values  # get end date of CSV
+            self.choose_date(csv_read)
+
+            start_date = csv_read[self.MESS_DATUM][0]  # get the start date of CSV
+            end_date = csv_read[self.MESS_DATUM][-1:].values  # get end date of CSV
             dict_date = dict(start = start_date, end = end_date[0])
 
             self.times.append(dict_date)
 
         return csv_read
+
+    def choose_date(self, csv_read):
+        colomns = csv_read.columns
+        regex = re.compile(r'^MESS_DATUM*')
+        colomns_list = list(filter(regex.match, colomns))
+        if len(colomns_list) > 1:
+            self.MESS_DATUM = 'MESS_DATUM_ENDE'
 
     def dwd_response(self):
 
@@ -123,7 +136,7 @@ class TimeSeries:
 
         """
         if epoch in ['recent', 'now']  :  # remove redundancy (the Data from 'historical' comes at first )
-            list_of_dicts = r_dict[r_dict['MESS_DATUM'] > int(self.times[0]['end'])].to_dict('records')
+            list_of_dicts = r_dict[r_dict[self.MESS_DATUM] > int(self.times[0]['end'])].to_dict('records')
 
         else:
             list_of_dicts = r_dict.to_dict('records')
@@ -131,9 +144,9 @@ class TimeSeries:
         for i, single_dict in enumerate(list_of_dicts, 2):
             single_dict.pop('STATIONS_ID', None)
             single_dict.pop('eor', None)
-            source_time = str(decimal.Decimal(single_dict['MESS_DATUM'])).ljust(12, '0')
+            source_time = str(decimal.Decimal(single_dict[self.MESS_DATUM])).ljust(12, '0')
             single_dict['timestamp'] = util.deserialize_datetime(source_time)
-            single_dict.pop('MESS_DATUM', None)
+            single_dict.pop(self.MESS_DATUM, None)
             timestamp = pytz.utc.localize(single_dict['timestamp'])  # type: datetime
             if (self.start <= timestamp) and (timestamp <= self.end):
                 self.extract_timestamp(epoch, file_name, i, single_dict)
