@@ -6,8 +6,8 @@ info:
   version: "0.0.1"
   title: "DWD-Proxy"
   contact: {}
-#host: "www.example.com"
-host: "localhost:8080"
+host: "www.example.com"
+#host: "localhost:8080"
 basePath: "/"
 schemes:
   - "https"
@@ -19,7 +19,9 @@ produces:
 paths:
   /capabilities/{stationId}:
     get:
-      description: "Query the capabilities of a specific station by its station ID."
+      tags:
+      - "Capabilities"
+      summary: "Query the capabilities of a specific station by its station ID."
       operationId: "capabilities_station_id_get"
       produces:
         - "application/json"
@@ -49,7 +51,9 @@ paths:
       x-swagger-router-controller: "app.controllers.default_controller"
   /timeseries/{stationId}/{resolution}/{observation_type}:
     get:
-      description: "Query the DWD FTP service by a specified station, resolution and\
+      tags:
+      - "Timeseries"
+      summary: "Query the DWD FTP service by a specified station, resolution and\
         \ datatype and a optional timerange"
       operationId: "timeseries_station_id_resolution_observation_type_get"
       produces:
@@ -72,6 +76,8 @@ paths:
             - "daily"
             - "hourly"
             - "monthly"
+            - "annual"
+            - "subdaily"
         - name: "observation_type"
           in: "path"
           description: "The type of observation which should be queried\n"
@@ -127,6 +133,8 @@ paths:
                   - "daily"
                   - "hourly"
                   - "monthly"
+                  - "annual"
+                  - "subdaily"
               observation_type:
                 type: "string"
                 description: "The given observation type"
@@ -176,6 +184,30 @@ paths:
                 type: "string"
               message:
                 type: "string"
+        500:
+          description: "Internal Server Error"
+          schema:
+            type: "object"
+            required:
+              - "code"
+              - "message"
+            properties:
+              code:
+                type: "string"
+              message:
+                type: "string"
+        default:
+            description: "Unexpected error please contact the Admin"
+            schema:
+              type: "object"
+              required:
+                - "code"
+                - "message"
+              properties:
+                code:
+                  type: "string"
+                message:
+                  type: "string"
       x-swagger-router-controller: "app.controllers.default_controller"
 definitions:
   Resolutions:
@@ -186,6 +218,7 @@ definitions:
       - "daily"
       - "hourly"
       - "monthly"
+      - "annual"
   ObservationTypes:
     type: "string"
     enum:
@@ -218,6 +251,8 @@ definitions:
           - "daily"
           - "hourly"
           - "monthly"
+          - "annual"
+          - "subdaily"
       observationTypes:
         type: "array"
         items:
@@ -344,6 +379,8 @@ definitions:
           - "daily"
           - "hourly"
           - "monthly"
+          - "annual"
+          - "subdaily"
       observation_type:
         type: "string"
         description: "The given observation type"

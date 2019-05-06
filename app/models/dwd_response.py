@@ -18,15 +18,15 @@ class Response(Model):
 
     def __init__(self, station_id: str = None, resolution: str = None, observation_type: str = None,
                  timeseries: List[ResponseTimeseries] = None):  # noqa: E501
-        """InlineResponse2001 - a model defined in Swagger
+        """
 
-        :param station_id: The station_id of this InlineResponse2001.  # noqa: E501
+        :param station_id: The station_id of this Response200.  # noqa: E501
         :type station_id: str
-        :param resolution: The resolution of this InlineResponse2001.  # noqa: E501
+        :param resolution: The resolution of this Response200.  # noqa: E501
         :type resolution: str
         :param observation_type: The observation_type of this InlineResponse2001.  # noqa: E501
         :type observation_type: str
-        :param timeseries: The timeseries of this InlineResponse2001.  # noqa: E501
+        :param timeseries: The timeseries of this Response200.  # noqa: E501
         :type timeseries: List[ResponseTimeseries]
         """
         self.swagger_types = {
@@ -102,7 +102,7 @@ class Response(Model):
         :param resolution: The resolution of this InlineResponse2001.
         :type resolution: str
         """
-        allowed_values = ["10_minutes", "1_minute", "daily", "hourly", "monthly"]  # noqa: E501
+        allowed_values = ["10_minutes", "1_minute", "daily", "hourly", "monthly", "annual", "subdaily"] # noqa: E501
         if resolution not in allowed_values:
             raise ValueError(
                 "Invalid value for `resolution` ({0}), must be one of {1}"

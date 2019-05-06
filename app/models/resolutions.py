@@ -23,6 +23,9 @@ class Resolutions(Model):
     DAILY = "daily"
     HOURLY = "hourly"
     MONTHLY = "monthly"
+    ANNUAL = "annual"
+    MULTI_ANNUAL = "multi_annual"
+    SUBDAILY = "subdaily"
 
     def __init__(self):  # noqa: E501
         """Resolutions - a model defined in Swagger
